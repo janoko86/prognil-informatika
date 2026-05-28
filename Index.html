@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>E-Rapor Digital - SMPK 3 PENABUR</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Poppins', sans-serif; }
+    .bg-penabur { background-color: #0F4C81; }
+    .text-penabur { color: #0F4C81; }
+    .border-penabur { border-color: #0F4C81; }
+  </style>
+</head>
+<body class="bg-slate-50 min-h-screen flex flex-col justify-between">
+
+  <div id="loginPage" class="flex-grow flex items-center justify-center p-4">
+    <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border-t-8 border-penabur text-center">
+      <div class="w-20 h-20 bg-amber-400 rounded-full mx-auto flex items-center justify-center shadow-md mb-4 border-2 border-blue-900">
+        <span class="text-blue-900 font-bold text-2xl">P3</span>
+      </div>
+      <h2 class="text-2xl font-bold text-gray-800 uppercase tracking-wide">SMPK 3 PENABUR</h2>
+      <p class="text-[11px] text-gray-400 font-bold uppercase tracking-widest mb-6">Sistem Informasi Nilai Informatika</p>
+      
+      <div class="text-left mb-6">
+        <label class="block text-xs font-bold text-gray-600 uppercase mb-2">Nomor Induk Siswa Nasional (NISN)</label>
+        <input type="text" id="nisnInput" placeholder="Masukkan NISN Anda" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-800 text-center font-bold text-lg tracking-widest">
+      </div>
+      
+      <button onclick="prosesLogin()" id="loginBtn" class="w-full bg-penabur hover:bg-blue-950 text-white font-bold py-3.5 rounded-xl transition shadow-md uppercase tracking-wider text-xs">
+        <span id="btnText">Masuk Aplikasi</span>
+      </button>
+      <p id="errorMessage" class="text-red-500 text-xs font-semibold mt-4 hidden bg-red-50 py-2.5 rounded-xl border border-red-100"></p>
+    </div>
+  </div>
+
+  <div id="dashboardPage" class="hidden w-full max-w-7xl mx-auto p-4 md:p-6 flex-grow">
+    
+    <div class="bg-penabur text-white p-6 rounded-2xl shadow-lg mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div>
+        <h1 class="text-2xl font-bold tracking-wide">E-Rapor Hasil Belajar</h1>
+        <p class="text-amber-300 text-xs font-semibold uppercase tracking-widest mt-0.5">SMPK 3 PENABUR JAKARTA</p>
+      </div>
+      <button onclick="logout()" class="bg-red-500 hover:bg-red-600 text-white px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition shadow-sm">
+        Keluar Aplikasi
+      </button>
+    </div>
+
+    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200/60 mb-6 grid grid-cols-2 md:grid-cols-4 gap-6">
+      <div>
+        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-1">Nama Lengkap</p>
+        <p id="lblNama" class="font-bold text-slate-800 text-base border-l-4 border-amber-400 pl-2">-</p>
+      </div>
+      <div>
+        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-1">NISN</p>
+        <p id="lblNisn" class="font-semibold text-slate-600 text-sm pl-1">-</p>
+      </div>
+      <div>
+        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-1">Kelas</p>
+        <p id="lblKelas" class="font-semibold text-slate-600 text-sm pl-1">-</p>
+      </div>
+      <div>
+        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-1">No. Absen</p>
+        <p id="lblAbsen" class="font-semibold text-slate-600 text-sm pl-1">-</p>
+      </div>
+    </div>
+
+    <div class="flex gap-2 mb-4 bg-slate-200/80 p-1 rounded-xl w-fit">
+      <button id="btnGanjil" onclick="gantiSemester('GANJIL')" class="px-5 py-2 rounded-lg font-bold text-xs uppercase tracking-wider transition bg-white text-penabur shadow-sm">
+        Semester Ganjil
+      </button>
+      <button id="btnGenap" onclick="gantiSemester('GENAP')" class="px-5 py-2 rounded-lg font-bold text-xs uppercase tracking-wider transition text-gray-500 hover:text-penabur">
+        Semester Genap
+      </button>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200/60 overflow-hidden">
+      <div class="p-5 border-b border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+        <h3 id="txtJudulTabel" class="font-bold text-slate-700 text-sm uppercase tracking-wider">Transkrip Nilai Hasil Belajar</h3>
+        <span class="text-[10px] text-red-600 font-bold bg-red-50 border border-red-100 px-3 py-1 rounded-full">
+          *Nilai di bawah KKM 71 otomatis berwarna merah
+        </span>
+      </div>
+      
+      <div class="overflow-x-auto max-h-[600px] overflow-y-auto">
+        <table class="w-full text-left border-collapse min-w-[1100px]">
+          <thead>
+            <tr class="bg-slate-100 text-slate-600 uppercase text-[10px] tracking-wider text-center sticky top-0 z-10">
+              <th class="py-4 px-4 font-bold text-left bg-slate-100 sticky left-0 z-20 border-r w-[260px] shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">Mata Pelajaran</th>
+              <th class="py-4 px-1 font-semibold border-r">SUM 1</th>
+              <th class="py-4 px-1 font-semibold border-r">SUM 2</th>
+              <th class="py-4 px-1 font-semibold border-r">SUM 3</th>
+              <th class="py-4 px-1 font-semibold border-r">SUM 4</th>
+              <th class="py-4 px-1 font-semibold border-r">SUM 5</th>
+              <th class="py-4 px-1 font-semibold border-r">SUM 6</th>
+              <th class="py-4 px-1 font-semibold border-r">SUM 7</th>
+              <th class="py-4 px-1 font-semibold border-r">SUM 8</th>
+              <th class="py-4 px-1 font-semibold border-r">SUM 9</th>
+              <th class="py-4 px-1 font-semibold border-r">SUM 10</th>
+              <th class="py-4 px-4 font-bold bg-blue-50 text-penabur min-w-[100px]">RATA-RATA</th>
+            </tr>
+          </thead>
+          <tbody id="tabelNilaiBody" class="text-slate-700 text-xs divide-y divide-slate-100">
+            </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <footer class="text-center py-4 text-[10px] text-gray-400 font-medium bg-white border-t border-slate-200/50 w-full tracking-wider uppercase">
+    &copy; 2026 SMPK 3 PENABUR Jakarta. Serverless Systems Client.
+  </footer>
+
+  <script>
+    // ⚠️ MASUKKAN ID GOOGLE SPREADSHEET ANDA DI SINI
+    const SPREADSHEET_ID = 'MASUKKAN_ID_SPREADSHEET_ANDA';
+
+    let siswaAktif = null;
+    let recordsNilaiKompilasi = [];
+    let semesterTerpilih = 'GANJIL';
+
+    async function ambilBarisGoogleSheet(namaSheet) {
+      const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(namaSheet)}`;
+      const respon = await fetch(url);
+      const teks = await respon.text();
+      const jsonMurni = teks.substring(teks.indexOf('{'), teks.lastIndexOf('}') + 1);
+      const dataObjek = JSON.parse(jsonMurni);
+      return dataObjek.table.rows.map(row => row.c.map(cell => cell ? cell.v : ''));
+    }
+
+    async function prosesLogin() {
+      const inputNisn = document.getElementById('nisnInput').value.trim();
+      const btnText = document.getElementById('btnText');
+      const errorLabel = document.getElementById('errorMessage');
+
+      if (!inputNisn) {
+        tampilkanError("Mohon masukkan nomor NISN Anda!");
+        return;
+      }
+
+      btnText.innerText = "Mengotentikasi Identitas...";
+      errorLabel.classList.add('hidden');
+
+      try {
+        // 1. Validasi Profil di Sheet1
+        const dataSheet1 = await ambilBarisGoogleSheet('Sheet1');
+        let indexSiswa = -1;
+
+        for (let i = 1; i < dataSheet1.length; i++) {
+          if (dataSheet1[i][0] && dataSheet1[i][0].toString() === inputNisn) {
+            indexSiswa = i;
+            break;
+          }
+        }
+
+        if (indexSiswa === -1) {
+          tampilkanError("NISN tidak terdaftar dalam database kesiswaan!");
+          btnText.innerText = "Masuk Aplikasi";
+          return;
+        }
+
+        siswaAktif = {
+          nisn: dataSheet1[indexSiswa][0],
+          nama: dataSheet1[indexSiswa][1],
+          kelas: dataSheet1[indexSiswa][2],
+          noAbsen: dataSheet1[indexSiswa][3]
+        };
+
+        // 2. Tarik Data Nilai Informatika di Sheet2
+        const dataSheet2 = await ambilBarisGoogleSheet('Sheet2');
+        recordsNilaiKompilasi = [];
+
+        for (let m = 1; m < dataSheet2.length; m++) {
+          if (dataSheet2[m][0] && dataSheet2[m][0].toString() === inputNisn) {
+            let arraySkor = [];
+            
+            // Pemetaan Kolom Sheet2: 
+            // A(0)=NISN | B(1)=Nama | C(2)=Semester | D s.d M (indeks 3 s.d 12)=SUM1 s.d SUM10
+            for (let k = 3; k <= 12; k++) {
+              let skorIndividu = dataSheet2[m][k];
+              arraySkor.push(skorIndividu !== '' && skorIndividu !== null ? Number(skorIndividu) : 0);
+            }
+
+            let totalSkor = arraySkor.reduce((a, b) => a + b, 0);
+            let rataRataAkhir = (totalSkor / 10).toFixed(2);
+
+            recordsNilaiKompilasi.push({
+              semester: dataSheet2[m][2].toString().toUpperCase().trim(),
+              namaMapel: "INFORMATIKA",
+              scores: arraySkor,
+              rerata: rataRataAkhir
+            });
+          }
+        }
+
+        masukDashboard();
+
+      } catch (err) {
+        console.error(err);
+        tampilkanError("Koneksi gagal. Periksa kembali ID Spreadsheet dan status Publish to Web!");
+        btnText.innerText = "Masuk Aplikasi";
+      }
+    }
+
+    function tampilkanError(pesan) {
+      const errorLabel = document.getElementById('errorMessage');
+      errorLabel.innerText = pesan;
+      errorLabel.classList.remove('hidden');
+    }
+
+    function masukDashboard() {
+      document.getElementById('loginPage').classList.add('hidden');
+      document.getElementById('dashboardPage').classList.remove('hidden');
+
+      document.getElementById('lblNama').innerText = siswaAktif.nama;
+      document.getElementById('lblNisn').innerText = siswaAktif.nisn;
+      document.getElementById('lblKelas').innerText = siswaAktif.kelas;
+      document.getElementById('lblAbsen').innerText = siswaAktif.noAbsen;
+
+      renderKontenTabel();
+    }
+
+    function gantiSemester(pilihanSem) {
+      semesterTerpilih = pilihanSem;
+      const btnGanjil = document.getElementById('btnGanjil');
+      const btnGenap = document.getElementById('btnGenap');
+      const txtJudul = document.getElementById('txtJudulTabel');
+
+      if (pilihanSem === 'GANJIL') {
+        btnGanjil.className = "px-5 py-2 rounded-lg font-bold text-xs uppercase tracking-wider transition bg-white text-penabur shadow-sm";
+        btnGenap.className = "px-5 py-2 rounded-lg font-bold text-xs uppercase tracking-wider transition text-gray-500 hover:text-penabur";
+        txtJudul.innerText = "Transkrip Nilai Informatika - Semester Ganjil";
+      } else {
+        btnGenap.className = "px-5 py-2 rounded-lg font-bold text-xs uppercase tracking-wider transition bg-white text-penabur shadow-sm";
+        btnGanjil.className = "px-5 py-2 rounded-lg font-bold text-xs uppercase tracking-wider transition text-gray-500 hover:text-penabur";
+        txtJudul.innerText = "Transkrip Nilai Informatika - Semester Genap";
+      }
+      renderKontenTabel();
+    }
+
+    function renderKontenTabel() {
+      const tbody = document.getElementById('tabelNilaiBody');
+      tbody.innerHTML = '';
+
+      const dataSesuaiSemester = recordsNilaiKompilasi.filter(item => item.semester === semesterTerpilih);
+
+      if (dataSesuaiSemester.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="12" class="text-center py-10 font-bold text-gray-400 bg-slate-50/50">Belum ada rekaman entri nilai Informatika untuk Semester ${semesterTerpilih}</td></tr>`;
+        return;
+      }
+
+      dataSesuaiSemester.forEach(item => {
+        let barisHtml = `<tr class="hover:bg-slate-50 transition text-center">
+          <td class="py-3 px-4 font-bold text-slate-800 text-left border-r bg-white sticky left-0 z-5 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.03)]">${item.namaMapel}</td>`;
+        
+        // Kriteria 5: Jika nilai di bawah 71, warnai dengan merah tebal
+        item.scores.forEach(score => {
+          let styleWarna = score < 71 ? 'text-red-600 font-extrabold bg-red-50/40' : 'text-slate-600 font-medium';
+          barisHtml += `<td class="py-3 px-1 border-r ${styleWarna}">${score}</td>`;
+        });
+
+        // Kolom Rata-Rata otomatis di kolom terakhir (Kriteria 4)
+        let warnaRerata = item.rerata < 71 ? 'text-red-600' : 'text-green-600';
+        barisHtml += `<td class="py-3 px-4 font-bold bg-blue-50/60 ${warnaRerata} text-xs">${item.rerata}</td></tr>`;
+
+        tbody.innerHTML += barisHtml;
+      });
+    }
+
+    function logout() {
+      siswaAktif = null;
+      recordsNilaiKompilasi = [];
+      semesterTerpilih = 'GANJIL';
+      document.getElementById('nisnInput').value = '';
+      gantiSemester('GANJIL');
+      
+      document.getElementById('dashboardPage').classList.add('hidden');
+      document.getElementById('loginPage').classList.remove('hidden');
+      document.getElementById('btnText').innerText = "Masuk Aplikasi";
+    }
+  </script>
+</body>
+</html>
