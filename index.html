@@ -17,9 +17,21 @@
 
   <div id="loginPage" class="flex-grow flex items-center justify-center p-4">
     <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border-t-8 border-penabur text-center">
-      <div class="w-20 h-20 bg-amber-400 rounded-full mx-auto flex items-center justify-center shadow-md mb-4 border-2 border-blue-900">
-        <span class="text-blue-900 font-bold text-2xl">P3</span>
+      
+      <div class="mx-auto mb-6 flex justify-center">
+        <svg class="h-28 w-28 text-penabur" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M50 5C50 5 85 12 85 45C85 75 50 95 50 95C50 95 15 75 15 45C15 12 50 5 50 5Z" fill="#0F4C81" stroke="#000000" stroke-width="1.5"/>
+          <path d="M50 12C50 12 78 18 78 45C78 70 50 87 50 87C50 87 22 70 22 45C22 18 50 12 50 12Z" fill="#FFF200"/>
+          <rect x="46" y="22" width="8" height="32" fill="#0F4C81"/>
+          <rect x="34" y="30" width="32" height="8" fill="#0F4C81"/>
+          <path d="M30 65C38 60 50 63 50 63C50 63 62 60 70 65V53C62 48 50 51 50 51C50 51 38 48 30 53V65Z" fill="#FFFFFF" stroke="#000000" stroke-width="1"/>
+          <path id="textPath" d="M 16,48 A 34,34 0 0,1 84,48" fill="none"/>
+          <text font-size="6.5" font-weight="bold" fill="#0F4C81" tracking="1">
+            <textPath href="#textPath" startOffset="50%" text-anchor="middle">IMAN, ILMU, DAN PELAYANAN</textPath>
+          </text>
+        </svg>
       </div>
+      
       <h2 class="text-2xl font-bold text-gray-800 uppercase tracking-wide">SMPK 3 PENABUR</h2>
       <p class="text-[11px] text-gray-400 font-bold uppercase tracking-widest mb-6">Sistem Informasi Nilai Informatika</p>
       
@@ -38,9 +50,16 @@
   <div id="dashboardPage" class="hidden w-full max-w-7xl mx-auto p-4 md:p-6 flex-grow">
     
     <div class="bg-penabur text-white p-6 rounded-2xl shadow-lg mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-      <div>
-        <h1 class="text-2xl font-bold tracking-wide">E-Rapor Hasil Belajar</h1>
-        <p class="text-amber-300 text-xs font-semibold uppercase tracking-widest mt-0.5">SMPK 3 PENABUR JAKARTA</p>
+      <div class="flex items-center gap-4">
+        <svg class="h-12 w-12 hidden sm:block" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M50 5C50 5 85 12 85 45C85 75 50 95 50 95C50 95 15 75 15 45C15 12 50 5 50 5Z" fill="#FFF200"/>
+          <rect x="46" y="25" width="8" height="32" fill="#0F4C81"/>
+          <rect x="34" y="33" width="32" height="8" fill="#0F4C81"/>
+        </svg>
+        <div>
+          <h1 class="text-2xl font-bold tracking-wide">E-Rapor Hasil Belajar</h1>
+          <p class="text-amber-300 text-xs font-semibold uppercase tracking-widest mt-0.5">SMPK 3 PENABUR JAKARTA</p>
+        </div>
       </div>
       <button onclick="logout()" class="bg-red-500 hover:bg-red-600 text-white px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition shadow-sm">
         Keluar Aplikasi
@@ -79,7 +98,7 @@
       <div class="p-5 border-b border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
         <h3 id="txtJudulTabel" class="font-bold text-slate-700 text-sm uppercase tracking-wider">Transkrip Nilai Hasil Belajar</h3>
         <span class="text-[10px] text-red-600 font-bold bg-red-50 border border-red-100 px-3 py-1 rounded-full">
-          *Nilai di bawah KKM 71 otomatis berwarna merah
+          *Nilai di bawah 71 otomatis berwarna merah
         </span>
       </div>
       
@@ -109,11 +128,11 @@
   </div>
 
   <footer class="text-center py-4 text-[10px] text-gray-400 font-medium bg-white border-t border-slate-200/50 w-full tracking-wider uppercase">
-    &copy; 2026 SMPK 3 PENABUR Jakarta. Serverless Systems Client.
+    &copy; 2026 SMPK 3 PENABUR Jakarta. Serverless Database Integration.
   </footer>
 
   <script>
-    // ⚠️ MASUKKAN ID GOOGLE SPREADSHEET ANDA DI SINI
+    // ⚠️ MASUKKAN ID SPREADSHEET GOOGLE ANDA DI SINI
     const SPREADSHEET_ID = '14gQ2HRqwS8cN2wZ76Cg4v51B7yxqkXYzsQdSgiDj7wg';
 
     let siswaAktif = null;
@@ -139,11 +158,11 @@
         return;
       }
 
-      btnText.innerText = "Mengotentikasi Identitas...";
+      btnText.innerText = "Mengotentikasi Akun...";
       errorLabel.classList.add('hidden');
 
       try {
-        // 1. Validasi Profil di Sheet1
+        // 1. Ambil Profil di Sheet1
         const dataSheet1 = await ambilBarisGoogleSheet('Sheet1');
         let indexSiswa = -1;
 
@@ -155,7 +174,7 @@
         }
 
         if (indexSiswa === -1) {
-          tampilkanError("NISN tidak terdaftar dalam database kesiswaan!");
+          tampilkanError("NISN tidak ditemukan di database!");
           btnText.innerText = "Masuk Aplikasi";
           return;
         }
@@ -167,7 +186,7 @@
           noAbsen: dataSheet1[indexSiswa][3]
         };
 
-        // 2. Tarik Data Nilai Informatika di Sheet2
+        // 2. Ambil Nilai di Sheet2 (Informatika)
         const dataSheet2 = await ambilBarisGoogleSheet('Sheet2');
         recordsNilaiKompilasi = [];
 
@@ -175,8 +194,7 @@
           if (dataSheet2[m][0] && dataSheet2[m][0].toString() === inputNisn) {
             let arraySkor = [];
             
-            // Pemetaan Kolom Sheet2: 
-            // A(0)=NISN | B(1)=Nama | C(2)=Semester | D s.d M (indeks 3 s.d 12)=SUM1 s.d SUM10
+            // Kolom D s.d M (indeks 3 s.d 12) = SUM1 s.d SUM10
             for (let k = 3; k <= 12; k++) {
               let skorIndividu = dataSheet2[m][k];
               arraySkor.push(skorIndividu !== '' && skorIndividu !== null ? Number(skorIndividu) : 0);
@@ -198,7 +216,7 @@
 
       } catch (err) {
         console.error(err);
-        tampilkanError("Koneksi gagal. Periksa kembali ID Spreadsheet dan status Publish to Web!");
+        tampilkanError("Koneksi cloud gagal. Pastikan Google Sheets Anda sudah di-Publish to Web!");
         btnText.innerText = "Masuk Aplikasi";
       }
     }
@@ -246,7 +264,7 @@
       const dataSesuaiSemester = recordsNilaiKompilasi.filter(item => item.semester === semesterTerpilih);
 
       if (dataSesuaiSemester.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="12" class="text-center py-10 font-bold text-gray-400 bg-slate-50/50">Belum ada rekaman entri nilai Informatika untuk Semester ${semesterTerpilih}</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="12" class="text-center py-10 font-bold text-gray-400 bg-slate-50/50">Belum ada entri nilai Informatika untuk Semester ${semesterTerpilih}</td></tr>`;
         return;
       }
 
@@ -254,13 +272,12 @@
         let barisHtml = `<tr class="hover:bg-slate-50 transition text-center">
           <td class="py-3 px-4 font-bold text-slate-800 text-left border-r bg-white sticky left-0 z-5 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.03)]">${item.namaMapel}</td>`;
         
-        // Kriteria 5: Jika nilai di bawah 71, warnai dengan merah tebal
+        // Aturan: Jika nilai di bawah 71, beri warna teks merah tebal
         item.scores.forEach(score => {
           let styleWarna = score < 71 ? 'text-red-600 font-extrabold bg-red-50/40' : 'text-slate-600 font-medium';
           barisHtml += `<td class="py-3 px-1 border-r ${styleWarna}">${score}</td>`;
         });
 
-        // Kolom Rata-Rata otomatis di kolom terakhir (Kriteria 4)
         let warnaRerata = item.rerata < 71 ? 'text-red-600' : 'text-green-600';
         barisHtml += `<td class="py-3 px-4 font-bold bg-blue-50/60 ${warnaRerata} text-xs">${item.rerata}</td></tr>`;
 
@@ -268,6 +285,7 @@
       });
     }
 
+    // Keluar sistem
     function logout() {
       siswaAktif = null;
       recordsNilaiKompilasi = [];
