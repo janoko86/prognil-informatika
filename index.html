@@ -25,8 +25,8 @@
           <rect x="46" y="22" width="8" height="32" fill="#0F4C81"/>
           <rect x="34" y="30" width="32" height="8" fill="#0F4C81"/>
           <path d="M30 65C38 60 50 63 50 63C50 63 62 60 70 65V53C62 48 50 51 50 51C50 51 38 48 30 53V65Z" fill="#FFFFFF" stroke="#000000" stroke-width="1"/>
-          <path id="textPath" d="M 16,48 A 34,34 0 0,1 84,48" fill="none"/>
-          <text font-size="6.5" font-weight="bold" fill="#0F4C81" tracking="1">
+          <path id="textPath" d="M 16,50 A 34,34 0 0,0 84,50" fill="none"/>
+          <text font-size="5.8" font-weight="bold" fill="#0F4C81" letter-spacing="0.3">
             <textPath href="#textPath" startOffset="50%" text-anchor="middle">IMAN, ILMU, DAN PELAYANAN</textPath>
           </text>
         </svg>
@@ -37,7 +37,7 @@
       
       <div class="text-left mb-6">
         <label class="block text-xs font-bold text-gray-600 uppercase mb-2">Nomor Induk Siswa Nasional (NISN)</label>
-        <input type="text" id="nisnInput" placeholder="Masukkan NISN Anda" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-800 text-center font-bold text-lg tracking-widest">
+        <input type="text" id="nisnInput" placeholder="Masukkan NISN Siswa" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-800 text-center font-bold text-lg tracking-widest">
       </div>
       
       <button onclick="prosesLogin()" id="loginBtn" class="w-full bg-penabur hover:bg-blue-950 text-white font-bold py-3.5 rounded-xl transition shadow-md uppercase tracking-wider text-xs">
@@ -96,7 +96,7 @@
 
     <div class="bg-white rounded-2xl shadow-sm border border-slate-200/60 overflow-hidden">
       <div class="p-5 border-b border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-        <h3 id="txtJudulTabel" class="font-bold text-slate-700 text-sm uppercase tracking-wider">Transkrip Nilai Hasil Belajar</h3>
+        <h3 id="txtJudulTabel" class="font-bold text-slate-700 text-sm uppercase tracking-wider">Transkrip Nilai Informatika - Semester Ganjil</h3>
         <span class="text-[10px] text-red-600 font-bold bg-red-50 border border-red-100 px-3 py-1 rounded-full">
           *Nilai di bawah 71 otomatis berwarna merah
         </span>
@@ -128,17 +128,18 @@
   </div>
 
   <footer class="text-center py-4 text-[10px] text-gray-400 font-medium bg-white border-t border-slate-200/50 w-full tracking-wider uppercase">
-    &copy; 2026 SMPK 3 PENABUR Jakarta. Serverless Database Integration.
+    &copy; 2026 SMPK 3 PENABUR Jakarta. Terintegrasi Cloud Sheets Engine.
   </footer>
 
   <script>
-    // ⚠️ MASUKKAN ID SPREADSHEET GOOGLE ANDA DI SINI
+    // ⚠️ PASTIKAN UNTUK MENGGANTI BAGIAN INI DENGAN ID GOOGLE SPREADSHEET ANDA YANG VALID
     const SPREADSHEET_ID = '14gQ2HRqwS8cN2wZ76Cg4v51B7yxqkXYzsQdSgiDj7wg';
 
     let siswaAktif = null;
     let recordsNilaiKompilasi = [];
     let semesterTerpilih = 'GANJIL';
 
+    // Ambil JSON Data dari Google Sheets Visualisasi API
     async function ambilBarisGoogleSheet(namaSheet) {
       const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(namaSheet)}`;
       const respon = await fetch(url);
@@ -148,6 +149,7 @@
       return dataObjek.table.rows.map(row => row.c.map(cell => cell ? cell.v : ''));
     }
 
+    // Fungsi Logika Alur Validasi Login
     async function prosesLogin() {
       const inputNisn = document.getElementById('nisnInput').value.trim();
       const btnText = document.getElementById('btnText');
@@ -158,11 +160,11 @@
         return;
       }
 
-      btnText.innerText = "Mengotentikasi Akun...";
+      btnText.innerText = "Mengamankan Koneksi Data...";
       errorLabel.classList.add('hidden');
 
       try {
-        // 1. Ambil Profil di Sheet1
+        // 1. Ekstraksi Profil Siswa di Sheet1
         const dataSheet1 = await ambilBarisGoogleSheet('Sheet1');
         let indexSiswa = -1;
 
@@ -174,7 +176,7 @@
         }
 
         if (indexSiswa === -1) {
-          tampilkanError("NISN tidak ditemukan di database!");
+          tampilkanError("Nomor NISN Anda tidak ditemukan pada database sekolah!");
           btnText.innerText = "Masuk Aplikasi";
           return;
         }
@@ -186,7 +188,7 @@
           noAbsen: dataSheet1[indexSiswa][3]
         };
 
-        // 2. Ambil Nilai di Sheet2 (Informatika)
+        // 2. Ekstraksi Nilai Informatika di Sheet2
         const dataSheet2 = await ambilBarisGoogleSheet('Sheet2');
         recordsNilaiKompilasi = [];
 
@@ -194,12 +196,13 @@
           if (dataSheet2[m][0] && dataSheet2[m][0].toString() === inputNisn) {
             let arraySkor = [];
             
-            // Kolom D s.d M (indeks 3 s.d 12) = SUM1 s.d SUM10
+            // Mengambil Nilai SUM1 s.d SUM10 (Kolom Indeks 3 sampai 12 di Sheet2)
             for (let k = 3; k <= 12; k++) {
               let skorIndividu = dataSheet2[m][k];
               arraySkor.push(skorIndividu !== '' && skorIndividu !== null ? Number(skorIndividu) : 0);
             }
 
+            // Hitung Rata-Rata Otomatis secara Real-Time oleh Client Side browser
             let totalSkor = arraySkor.reduce((a, b) => a + b, 0);
             let rataRataAkhir = (totalSkor / 10).toFixed(2);
 
@@ -216,7 +219,7 @@
 
       } catch (err) {
         console.error(err);
-        tampilkanError("Koneksi cloud gagal. Pastikan Google Sheets Anda sudah di-Publish to Web!");
+        tampilkanError("Gagal memuat pangkalan data. Pastikan status dokumen spreadsheet Anda ter-Publish to Web!");
         btnText.innerText = "Masuk Aplikasi";
       }
     }
@@ -257,6 +260,7 @@
       renderKontenTabel();
     }
 
+    // Pemetaan data kedalam HTML table
     function renderKontenTabel() {
       const tbody = document.getElementById('tabelNilaiBody');
       tbody.innerHTML = '';
@@ -264,7 +268,7 @@
       const dataSesuaiSemester = recordsNilaiKompilasi.filter(item => item.semester === semesterTerpilih);
 
       if (dataSesuaiSemester.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="12" class="text-center py-10 font-bold text-gray-400 bg-slate-50/50">Belum ada entri nilai Informatika untuk Semester ${semesterTerpilih}</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="12" class="text-center py-10 font-bold text-gray-400 bg-slate-50/50">Belum ada entri transkrip nilai Informatika untuk Semester ${semesterTerpilih}</td></tr>`;
         return;
       }
 
@@ -272,12 +276,13 @@
         let barisHtml = `<tr class="hover:bg-slate-50 transition text-center">
           <td class="py-3 px-4 font-bold text-slate-800 text-left border-r bg-white sticky left-0 z-5 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.03)]">${item.namaMapel}</td>`;
         
-        // Aturan: Jika nilai di bawah 71, beri warna teks merah tebal
+        // Kondisi jika nilai di bawah 71, otomatis cetak teks tebal merah terang
         item.scores.forEach(score => {
           let styleWarna = score < 71 ? 'text-red-600 font-extrabold bg-red-50/40' : 'text-slate-600 font-medium';
           barisHtml += `<td class="py-3 px-1 border-r ${styleWarna}">${score}</td>`;
         });
 
+        // Tampilan total nilai rata-rata kalkulasi otomatis di ujung kanan
         let warnaRerata = item.rerata < 71 ? 'text-red-600' : 'text-green-600';
         barisHtml += `<td class="py-3 px-4 font-bold bg-blue-50/60 ${warnaRerata} text-xs">${item.rerata}</td></tr>`;
 
@@ -285,7 +290,6 @@
       });
     }
 
-    // Keluar sistem
     function logout() {
       siswaAktif = null;
       recordsNilaiKompilasi = [];
